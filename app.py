@@ -10,78 +10,240 @@ import os
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
-    page_title="OptiNet - Network Topology Simulator",
+    page_title="Endfield Industries // OptiNet Terminal",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CUSTOM CSS FOR PREMIUM AESTHETICS ---
+# --- CUSTOM CSS FOR ARKNIGHTS: ENDFIELD THEME ---
 st.markdown("""
 <style>
-    /* Main container styling */
-    .reportview-container {
-        background: #0e1117;
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;600;700&display=swap');
+
+    /* Global styling */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+        background-color: #0c0d0f !important;
+        color: #c5cacc !important;
+        font-family: 'Inter', sans-serif;
     }
     
-    /* Title and Headers */
-    h1, h2, h3 {
-        font-family: 'Outfit', 'Inter', sans-serif;
-        font-weight: 700;
-        letter-spacing: -0.5px;
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+        background-color: #111317 !important;
+        border-right: 1px solid #23272f !important;
+    }
+    
+    /* Input widgets text color */
+    div[data-baseweb="select"] > div, div[role="listbox"] {
+        background-color: #15181d !important;
+        color: #ffffff !important;
+        border: 1px solid #23272f !important;
+        border-radius: 0px !important;
+        font-family: 'Share Tech Mono', monospace !important;
+    }
+    
+    /* Headers */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Share Tech Mono', monospace !important;
+        color: #ffffff !important;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    
+    /* Top Header Meta */
+    .system-meta {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 11px;
+        color: #53607c;
+        letter-spacing: 2px;
+        margin-bottom: 2px;
     }
     
     .main-title {
-        background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 3rem !important;
+        font-family: 'Share Tech Mono', monospace !important;
+        color: #ffffff !important;
+        font-size: 2.8rem !important;
         font-weight: 800;
-        margin-bottom: 0.2rem;
+        letter-spacing: 3px;
+        margin-bottom: 0px;
+        text-transform: uppercase;
     }
     
-    .subtitle {
-        color: #9ca3af;
-        font-size: 1.15rem;
-        margin-bottom: 2rem;
+    .main-title span {
+        color: #ff6b00 !important; /* Endfield Orange */
     }
     
-    /* Premium Metric Card */
+    .brand-sub {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.85rem;
+        color: #ff6b00;
+        letter-spacing: 4px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #23272f;
+        padding-bottom: 12px;
+    }
+    
+    /* Hazard Stripes */
+    .hazard-bar {
+        height: 6px;
+        background: repeating-linear-gradient(
+            -45deg,
+            #ff6b00,
+            #ff6b00 12px,
+            #0c0d0f 12px,
+            #0c0d0f 24px
+        );
+        margin-bottom: 25px;
+        border: 1px solid #ff6b00;
+    }
+    
+    /* Tactical Metric Cards */
     .metric-card {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 16px;
-        padding: 24px;
-        text-align: center;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(5px);
-        transition: transform 0.2s, border-color 0.2s;
+        background: #14171c !important;
+        border: 1px solid #23272f !important;
+        border-left: 4px solid #ff6b00 !important;
+        border-radius: 0px !important; /* Sharp industrial corners */
+        padding: 22px !important;
+        position: relative;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
     }
     
-    .metric-card:hover {
-        transform: translateY(-5px);
-        border-color: rgba(99, 102, 241, 0.3);
-    }
-    
-    .metric-val {
-        font-size: 2.2rem;
-        font-weight: 800;
-        margin: 10px 0;
-        font-family: 'Outfit', sans-serif;
+    /* Small corner notch accent */
+    .metric-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 6px;
+        height: 6px;
+        background: #ff6b00;
     }
     
     .metric-label {
-        font-size: 0.85rem;
+        font-family: 'Share Tech Mono', monospace !important;
+        font-size: 0.8rem !important;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #9ca3af;
-        font-weight: 600;
+        letter-spacing: 2px;
+        color: #7d8b9e !important;
+        text-align: left;
+    }
+    
+    .metric-val {
+        font-family: 'Share Tech Mono', monospace !important;
+        font-size: 2.3rem !important;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 10px 0;
+        text-align: left;
     }
     
     .metric-desc {
-        font-size: 0.75rem;
-        color: #6b7280;
-        margin-top: 5px;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.72rem;
+        color: #4f5a6e;
+        text-align: left;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Tactical Buttons */
+    .stButton>button {
+        background-color: transparent !important;
+        color: #ff6b00 !important;
+        border: 1px solid #ff6b00 !important;
+        border-radius: 0px !important;
+        font-family: 'Share Tech Mono', monospace !important;
+        text-transform: uppercase !important;
+        letter-spacing: 2px !important;
+        transition: all 0.25s ease !important;
+        font-weight: bold !important;
+        padding: 10px 20px !important;
+    }
+    
+    .stButton>button:hover {
+        background-color: #ff6b00 !important;
+        color: #0c0d0f !important;
+        box-shadow: 0 0 15px rgba(255, 107, 0, 0.4) !important;
+        border-color: #ff6b00 !important;
+    }
+    
+    .stButton>button:active {
+        background-color: #e66000 !important;
+        border-color: #e66000 !important;
+    }
+
+    /* Download Button */
+    .stDownloadButton>button {
+        background-color: #ff6b00 !important;
+        color: #0c0d0f !important;
+        border: 1px solid #ff6b00 !important;
+        border-radius: 0px !important;
+        font-family: 'Share Tech Mono', monospace !important;
+        text-transform: uppercase !important;
+        letter-spacing: 2px !important;
+        font-weight: bold !important;
+        transition: all 0.25s ease !important;
+        width: 100%;
+    }
+    
+    .stDownloadButton>button:hover {
+        background-color: transparent !important;
+        color: #ff6b00 !important;
+        box-shadow: 0 0 15px rgba(255, 107, 0, 0.4) !important;
+    }
+    
+    /* Tabs styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        border-bottom: 1px solid #23272f;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background-color: #111317 !important;
+        border: 1px solid #23272f !important;
+        border-bottom: none !important;
+        border-radius: 0px !important;
+        color: #7d8b9e !important;
+        font-family: 'Share Tech Mono', monospace !important;
+        text-transform: uppercase;
+        padding: 10px 20px !important;
+        letter-spacing: 1.5px;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        color: #ff6b00 !important;
+        border-top: 3px solid #ff6b00 !important;
+        background-color: #14171c !important;
+        font-weight: bold;
+    }
+    
+    /* Markdown text and alerts */
+    .stAlert {
+        background-color: #14171c !important;
+        border: 1px solid #23272f !important;
+        border-left: 4px solid #ff6b00 !important;
+        border-radius: 0px !important;
+        color: #c5cacc !important;
+    }
+    
+    /* Progress bar */
+    .stProgress > div > div > div > div {
+        background-color: #ff6b00 !important;
+    }
+    
+    /* Code block styling */
+    code {
+        font-family: 'Share Tech Mono', monospace !important;
+        background-color: #14171c !important;
+        color: #ff6b00 !important;
+    }
+    
+    /* Data table header */
+    .dataframe th {
+        background-color: #111317 !important;
+        color: #ff6b00 !important;
+        font-family: 'Share Tech Mono', monospace !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -132,7 +294,7 @@ class Link:
         self.current_buffer_bytes = 0
         self.tx_resource = simpy.Resource(env, capacity=1)
         
-        # To track queue occupancy over time
+        # Track queue occupancy over time
         self.queue_history = [(0.0, 0.0)]
         
     def update_buffer(self, bytes_change):
@@ -188,18 +350,15 @@ def calculate_tx_details(size, physical_mtu, bandwidth, overhead_delay, ber):
     return total_tx_time, p_success
 
 def packet_transmit(env, packet, link, receiver):
-    # 1. Buffer Admission
     if link.current_buffer_bytes + packet.size > link.buffer_max_bytes:
         if not packet.is_background:
             receiver.record_drop(packet, 'Buffer Overflow')
         return
         
-    # 2. Enter Queue
     link.update_buffer(packet.size)
     
     with link.tx_resource.request() as req:
         yield req
-        # Start transmission, leave queue
         link.update_buffer(-packet.size)
         
         tx_time, p_success = calculate_tx_details(
@@ -207,10 +366,8 @@ def packet_transmit(env, packet, link, receiver):
         )
         yield env.timeout(tx_time)
         
-    # 3. Propagation
     yield env.timeout(link.prop_delay)
     
-    # 4. Receiver processing (Foreground only)
     if not packet.is_background:
         if random.random() < p_success:
             receiver.record_success(packet, env.now)
@@ -253,7 +410,6 @@ def calculate_jitter(delays):
     return sum(diffs) / len(diffs)
 
 def run_simulation(medium_name, mtu, load_fraction, sim_duration, warmup_time, fg_rate_bps, buffer_max_kb):
-    # Reset seeds for consistency
     random.seed(42)
     np.random.seed(42)
     
@@ -277,7 +433,6 @@ def run_simulation(medium_name, mtu, load_fraction, sim_duration, warmup_time, f
     
     env.run(until=sim_duration)
     
-    # Process queue history into steps
     times, sizes = zip(*link.queue_history)
     df_queue = pd.DataFrame({
         'Time (s)': times,
@@ -299,43 +454,46 @@ def run_simulation(medium_name, mtu, load_fraction, sim_duration, warmup_time, f
         'QueueDF': df_queue
     }
 
-# --- GUI LAYOUT ---
+# --- GUI HEADER (ARKNIGHTS: ENDFIELD STYLING) ---
 
-st.markdown('<div class="main-title">⚡ OptiNet Simulator</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Heterogeneous Network Topology & Statistical Experimentation Software</div>', unsafe_allow_html=True)
+st.markdown('<div class="system-meta">SYSTEM.STATUS: ACTIVE // USER.AUTH: HARIZUARU // ENDFIELD INDUSTRIES INC.</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">▲ OPTINET <span>TERMINAL</span></div>', unsafe_allow_html=True)
+st.markdown('<div class="brand-sub">ENDFIELD INDUSTRIES // NETWORK SIMULATION SYSTEM</div>', unsafe_allow_html=True)
+st.markdown('<div class="hazard-bar"></div>', unsafe_allow_html=True)
 
 # --- SIDEBAR CONFIGURATION ---
-st.sidebar.header("🛠️ Global Configuration")
+st.sidebar.markdown('<div style="font-family: \'Share Tech Mono\', monospace; color: #ff6b00; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid #23272f; padding-bottom: 5px; margin-bottom: 15px;">[SYS.CONFIG]</div>', unsafe_allow_html=True)
 
-sim_duration = st.sidebar.slider("Simulation Duration (seconds)", 5, 30, 10, help="Total simulated time for each run.")
-warmup_time = st.sidebar.slider("Warmup Time (seconds)", 1, 5, 1, help="Transient period discarded from statistics.")
-fg_rate_mbps = st.sidebar.slider("Probe Flow Rate (Mbps)", 0.5, 10.0, 2.0, step=0.5, help="Bandwidth consumed by the foreground probe flow.")
-buffer_max_kb = st.sidebar.number_input("Transmitter Buffer Size (KB)", min_value=10, max_value=5000, value=500, step=50, help="Max queue capacity in Kilobytes.")
+sim_duration = st.sidebar.slider("SIMULATION TIME (SEC)", 5, 30, 10, help="Total simulated time for each run.")
+warmup_time = st.sidebar.slider("WARMUP PERIOD (SEC)", 1, 5, 1, help="Transient period discarded from statistics.")
+fg_rate_mbps = st.sidebar.slider("FLOW INJECTION RATE (MBPS)", 0.5, 10.0, 2.0, step=0.5, help="Bandwidth consumed by the foreground probe flow.")
+buffer_max_kb = st.sidebar.number_input("BUFFER THRESHOLD (KB)", min_value=10, max_value=5000, value=500, step=50, help="Max queue capacity in Kilobytes.")
 
 fg_rate_bps = fg_rate_mbps * 1e6
 
 # --- TABS CREATION ---
-tab1, tab2, tab3 = st.tabs(["🎯 Single Scenario Simulator", "📊 Full Factorial Experiment", "📝 Analytical Insights & ANOVA Guide"])
+tab1, tab2, tab3 = st.tabs(["[01] LINK SIMULATOR", "[02] FACTORIAL EXPERIMENT", "[03] ANALYTICAL LOGS"])
 
 # --- TAB 1: SINGLE SCENARIO ---
 with tab1:
-    st.subheader("Simulate a Custom Network Link")
+    st.write("")
+    st.write("")
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        sel_medium = st.selectbox("Transmission Medium", ['Fiber', 'Copper', 'Wireless'])
+        sel_medium = st.selectbox("MEDIUM SELECT", ['Fiber', 'Copper', 'Wireless'])
     with col2:
-        sel_mtu = st.selectbox("Packet Size / MTU (Bytes)", [500, 1500, 9000], index=1)
+        sel_mtu = st.selectbox("MTU CONFIGURE (BYTES)", [500, 1500, 9000], index=1)
     with col3:
-        sel_load = st.slider("Background Traffic Load (%)", 0, 95, 50, step=5)
+        sel_load = st.slider("BACKGROUND LOAD (%)", 0, 95, 50, step=5)
     with col4:
-        st.write("") # spacing
+        st.write("") 
         st.write("")
-        run_btn = st.button("Run Simulation", type="primary", use_container_width=True)
+        run_btn = st.button("EXECUTE SIMULATION", type="primary", use_container_width=True)
         
     if run_btn or 'single_res' in st.session_state:
         if run_btn:
-            with st.spinner("Simulating events..."):
+            with st.spinner("EXECUTING PROTOCOLS..."):
                 st.session_state.single_res = run_simulation(
                     sel_medium, sel_mtu, sel_load / 100.0, sim_duration, warmup_time, fg_rate_bps, buffer_max_kb
                 )
@@ -349,71 +507,86 @@ with tab1:
             pdr_color = "#10b981" if res['PDR'] > 95 else ("#f59e0b" if res['PDR'] > 80 else "#ef4444")
             st.markdown(f"""
             <div class="metric-card">
-                <div class="metric-label">Packet Delivery Ratio</div>
+                <div class="metric-label">[PACKET DELIVERY RATIO]</div>
                 <div class="metric-val" style="color: {pdr_color}">{res['PDR']:.2f}%</div>
-                <div class="metric-desc">{res['PacketsReceived']} received of {res['PacketsSent']} sent</div>
+                <div class="metric-desc">RECV: {res['PacketsReceived']} // SENT: {res['PacketsSent']}</div>
             </div>
             """, unsafe_allow_html=True)
             
         with m_col2:
             st.markdown(f"""
             <div class="metric-card">
-                <div class="metric-label">End-to-End Delay</div>
-                <div class="metric-val" style="color: #6366f1">{res['AvgDelay_ms']:.4f} ms</div>
-                <div class="metric-desc">Avg delay including queuing</div>
+                <div class="metric-label">[END-TO-END DELAY]</div>
+                <div class="metric-val" style="color: #00e5ff">{res['AvgDelay_ms']:.4f} ms</div>
+                <div class="metric-desc">AVERAGE PROPAGATION + QUEUE</div>
             </div>
             """, unsafe_allow_html=True)
             
         with m_col3:
             st.markdown(f"""
             <div class="metric-card">
-                <div class="metric-label">Jitter</div>
-                <div class="metric-val" style="color: #a855f7">{res['Jitter_ms']:.4f} ms</div>
-                <div class="metric-desc">RFC 3550 average variation</div>
+                <div class="metric-label">[JITTER VARIATION]</div>
+                <div class="metric-val" style="color: #ff9f1c">{res['Jitter_ms']:.4f} ms</div>
+                <div class="metric-desc">RFC 3550 DEVIATION</div>
             </div>
             """, unsafe_allow_html=True)
             
         with m_col4:
             tot_drops = res['BufferDrops'] + res['ChannelDrops']
-            drop_color = "#ef4444" if tot_drops > 0 else "#6b7280"
+            drop_color = "#ef4444" if tot_drops > 0 else "#4f5a6e"
             st.markdown(f"""
             <div class="metric-card">
-                <div class="metric-label">Total Packets Dropped</div>
+                <div class="metric-label">[LINK PACKET DROPS]</div>
                 <div class="metric-val" style="color: {drop_color}">{tot_drops}</div>
-                <div class="metric-desc">{res['BufferDrops']} Buffer | {res['ChannelDrops']} Channel</div>
+                <div class="metric-desc">BUFFER: {res['BufferDrops']} // CHANNEL: {res['ChannelDrops']}</div>
             </div>
             """, unsafe_allow_html=True)
             
+        st.write("")
         st.write("---")
         
         # Plot Queue occupancy over time
-        st.subheader("Queue Occupancy over Time (Buffer Dynamics)")
+        st.subheader("📊 BUFFER DYNAMICS OVER TIME")
         df_q = res['QueueDF']
         
         fig_q = px.line(
             df_q, x='Time (s)', y='Queue Size (KB)',
-            title="Transmitter Buffer Occupancy (Kilobytes)",
-            line_shape='hv',
-            color_discrete_sequence=['#6366f1']
+            line_shape='hv'
         )
-        fig_q.add_hline(y=buffer_max_kb, line_dash="dash", line_color="#ef4444", annotation_text="Buffer Limit")
+        fig_q.add_hline(y=buffer_max_kb, line_dash="dash", line_color="#ef4444", annotation_text="BUFFER MAX CAPACITY")
+        
+        # Styled to match Arknights Endfield (Dark, sharp, orange trace)
+        fig_q.update_traces(line_color="#ff6b00", line_width=2)
         fig_q.update_layout(
-            plot_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="#14171c",
             paper_bgcolor="rgba(0,0,0,0)",
-            font_color="#9ca3af",
-            xaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.05)"),
-            yaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.05)", range=[0, max(buffer_max_kb * 1.1, df_q['Queue Size (KB)'].max() * 1.1)])
+            font_family="'Share Tech Mono', monospace",
+            font_color="#7d8b9e",
+            xaxis=dict(
+                showgrid=True, 
+                gridcolor="#23272f", 
+                linecolor="#23272f",
+                title_text="SIMULATION TIME (S)"
+            ),
+            yaxis=dict(
+                showgrid=True, 
+                gridcolor="#23272f", 
+                linecolor="#23272f", 
+                title_text="BUFFER OCCUPANCY (KB)",
+                range=[0, max(buffer_max_kb * 1.1, df_q['Queue Size (KB)'].max() * 1.1)]
+            ),
+            margin=dict(l=40, r=40, t=40, b=40)
         )
         st.plotly_chart(fig_q, use_container_width=True)
 
 # --- TAB 2: FULL FACTORIAL EXPERIMENT ---
 with tab2:
-    st.subheader("Run Full Factorial Experiment")
-    st.write("Iterates through all 27 combinations of **3 Media** $\\times$ **3 MTUs** $\\times$ **3 Traffic Loads**.")
+    st.write("")
+    st.subheader("EXPERIMENT MATRIX EXECUTION")
+    st.write("Automatically executes 27 protocol configurations (3 Media × 3 MTUs × 3 Loads).")
     
-    run_exp_btn = st.button("Run Full Factorial Experiment (27 Runs)", type="secondary")
+    run_exp_btn = st.button("INITIATE FULL FACTORIAL RUN (27 RUNS)", type="secondary")
     
-    # Load existing results if file exists, or run new
     csv_path = "simulation_results.csv"
     df_results = None
     
@@ -429,7 +602,7 @@ with tab2:
             for mtu in [500, 1500, 9000]:
                 for load_name, load_frac in {'Low': 0.20, 'Medium': 0.50, 'High': 0.80}.items():
                     count += 1
-                    status_text.write(f"Simulating Scenario {count}/{total_scenarios}: Medium={medium}, MTU={mtu}, Load={load_name}...")
+                    status_text.write(f"🧬 RUNNING SEQUENCE {count:02d}/{total_scenarios:02d}: MEDIUM={medium.upper()} | MTU={mtu} | LOAD={load_name.upper()}...")
                     
                     sim_res = run_simulation(
                         medium, mtu, load_frac, sim_duration, warmup_time, fg_rate_bps, buffer_max_kb
@@ -454,90 +627,106 @@ with tab2:
         
         df_results = pd.DataFrame(results)
         df_results.to_csv(csv_path, index=False)
-        st.success("Full Factorial Experiment Completed and saved to `simulation_results.csv`!")
+        st.success("SEQUENCE COMPLETE. DATA EXPORTED TO `simulation_results.csv`.")
     elif os.path.exists(csv_path):
         df_results = pd.read_csv(csv_path)
         
     if df_results is not None:
-        # Display DataFrame
         st.dataframe(df_results, use_container_width=True)
         
-        # Download Button
         csv_data = df_results.to_csv(index=False).encode('utf-8')
         st.download_button(
-            label="📥 Download CSV for ANOVA (Minitab/SPSS)",
+            label="📥 DOWNLOAD EXPORTED DATA (.CSV)",
             data=csv_data,
             file_name="simulation_results.csv",
             mime="text/csv",
         )
         
+        st.write("")
         st.write("---")
-        st.subheader("Experimental Factor Interactions & Trends")
+        st.subheader("📊 SEQUENCE CORRELATION ANALYSIS")
         
         vis_col1, vis_col2 = st.columns(2)
         
         with vis_col1:
-            # Interactive bar chart of PDR
+            # Styled bar chart of PDR
             fig_pdr = px.bar(
                 df_results, x='Medium', y='PacketDeliveryRatio_Percent', color='MTU',
                 barmode='group', facet_col='TrafficLoad',
-                title="Packet Delivery Ratio (%) by Medium, MTU, and Traffic Load",
-                labels={'PacketDeliveryRatio_Percent': 'PDR (%)', 'TrafficLoad': 'Load'},
-                color_continuous_scale=px.colors.sequential.Viridis
+                labels={'PacketDeliveryRatio_Percent': 'PDR (%)', 'TrafficLoad': 'LOAD'},
+                color_discrete_sequence=['#ff6b00', '#00e5ff', '#8892b0']
             )
-            fig_pdr.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)", font_color="#9ca3af")
+            fig_pdr.update_layout(
+                title_text="PACKET DELIVERY RATIO BY CONFIGURATION",
+                plot_bgcolor="#14171c",
+                paper_bgcolor="rgba(0,0,0,0)",
+                font_family="'Share Tech Mono', monospace",
+                font_color="#7d8b9e",
+                xaxis=dict(showgrid=True, gridcolor="#23272f"),
+                yaxis=dict(showgrid=True, gridcolor="#23272f")
+            )
             st.plotly_chart(fig_pdr, use_container_width=True)
             
         with vis_col2:
-            # Interactive line chart of Delay
-            # Group by Medium and Traffic Load and average
+            # Styled line chart of Delay
             fig_delay = px.line(
                 df_results, x='TrafficLoad', y='AvgDelay_ms', color='Medium', line_dash='MTU',
                 symbol='MTU',
-                title="Average End-to-End Delay (ms) by Load, Medium, and MTU",
-                labels={'AvgDelay_ms': 'Delay (ms)', 'TrafficLoad': 'Background Load'},
-                category_orders={'TrafficLoad': ['Low', 'Medium', 'High']}
+                labels={'AvgDelay_ms': 'DELAY (MS)', 'TrafficLoad': 'TRAFFIC LOAD'},
+                category_orders={'TrafficLoad': ['Low', 'Medium', 'High']},
+                color_discrete_sequence=['#ff6b00', '#00e5ff', '#8892b0']
             )
-            fig_delay.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)", font_color="#9ca3af")
+            fig_delay.update_layout(
+                title_text="LATENCY OVER TIME BY LOAD PATTERNS",
+                plot_bgcolor="#14171c",
+                paper_bgcolor="rgba(0,0,0,0)",
+                font_family="'Share Tech Mono', monospace",
+                font_color="#7d8b9e",
+                xaxis=dict(showgrid=True, gridcolor="#23272f"),
+                yaxis=dict(showgrid=True, gridcolor="#23272f")
+            )
             st.plotly_chart(fig_delay, use_container_width=True)
 
 # --- TAB 3: INSIGHTS & ANOVA ---
 with tab3:
-    st.subheader("Theoretical Insight & Underlying Equations")
+    st.write("")
+    st.subheader("SYSTEM EQUATIONS & MODELING PARAMETERS")
     
     st.markdown(r"""
-    ### How Packet Loss is Modeled
-    The simulation models packet corruption based on the **Bit Error Rate (BER)** of the medium. When a packet of size $S$ bytes (including header overheads) is transmitted, the probability of successful transmission without any bit errors is:
+    ### 1. CHANNEL CORRUPTION MATRIX
+    Packet loss is computed per fragment based on the physical Bit Error Rate (BER) of the selected transmission medium:
     $$P_{\text{success}} = (1 - \text{BER})^{8 \times S}$$
     
-    #### The Wireless and Jumbo Frame Penalty
-    - **Wireless Link**: High BER ($10^{-5}$).
-    - **Copper Link**: Moderate BER ($10^{-7}$).
-    - **Fiber Link**: Extremely low BER ($10^{-9}$).
-    
-    Additionally, Wireless and Copper have a **Physical MTU limit of 1500 bytes**. Sending a **9000-byte Jumbo frame** requires splitting it into **6 fragments**. Since IP reassembly requires all fragments to arrive safely, the entire packet is dropped if any fragment fails. 
-    
-    For a 9000-byte packet on Wireless:
-    $$P_{\text{packet\_success}} = \left((1 - 10^{-5})^{8 \times 1540}\right)^6 \approx 47.4\%$$
-    This is why you see a dramatic drop in PDR for the Wireless + 9000 MTU combination.
+    #### CONFIGURATION CONSTANTS
+    - **Fiber Link**: $\text{BER} = 10^{-9}$ (Virtual error-free transmission).
+    - **Copper Link**: $\text{BER} = 10^{-7}$ (Moderate industrial shielding).
+    - **Wireless Link**: $\text{BER} = 10^{-5}$ (Endfield outdoor interference/fading).
     
     ---
     
-    ### Guide: Setting up ANOVA in Minitab / SPSS
-    The exported `simulation_results.csv` contains a **General Linear Model** format. Follow these steps to run a Three-Way ANOVA:
+    ### 2. IP FRAGMENTATION DECAY
+    For physical media with standard MTU limits (**Copper** and **Wireless** both restricted to **1500 bytes**):
+    If a packet size exceeds the physical limit (such as a **9000-byte Jumbo frame**), the system fragments the payload:
+    $$N = \left\lceil \frac{\text{Packet Size}}{\text{Physical MTU}} \right\rceil$$
     
-    #### In Minitab:
-    1. Import the CSV file (**File > Open Worksheet**).
-    2. Go to **Stat > ANOVA > General Linear Model > Fit General Linear Model**.
-    3. In **Responses**, select `AvgDelay_ms` or `PacketDeliveryRatio_Percent`.
-    4. In **Factors**, select `Medium`, `MTU`, and `TrafficLoad`.
-    5. Click **Model...** to add interactions (e.g., select all three factors and click **Add** to include 2-way and 3-way interactions).
-    6. Click **OK** to run. Look at the **p-values** in the Analysis of Variance table. Any p-value $< 0.05$ indicates a statistically significant effect.
+    Each fragment adds a **40-byte header overhead** and triggers an inter-fragment delay (representing Wi-Fi backoffs or spacing):
+    - **Wireless Overhead**: $+100 \mu s$ per fragment.
+    - **Copper Overhead**: $+10 \mu s$ per fragment.
     
-    #### In SPSS:
-    1. Import the CSV file (**File > Import Data > CSV Data**).
-    2. Go to **Analyze > General Linear Model > Univariate**.
-    3. Move `AvgDelay_ms` or `PacketDeliveryRatio_Percent` to the **Dependent Variable** box.
-    4. Move `Medium`, `MTU`, and `TrafficLoad` to the **Fixed Factor(s)** box.
-    5. Click **OK** to run the multi-factor ANOVA.
+    ---
+    
+    ### 3. STATISTICAL DEPLOYMENT (ANOVA PREPARATION)
+    The generated data table complies with the **General Linear Model** standard. To perform Analysis of Variance (ANOVA):
+    
+    #### MINITAB SETUP
+    1. Import the worksheet (`simulation_results.csv`).
+    2. Navigate to **Stat > ANOVA > General Linear Model > Fit General Linear Model**.
+    3. Input `AvgDelay_ms` or `PacketDeliveryRatio_Percent` in **Responses**.
+    4. Input `Medium`, `MTU`, and `TrafficLoad` in **Factors**.
+    5. Add two-way and three-way interaction terms in the **Model** options.
+    
+    #### SPSS SETUP
+    1. Import the file (**File > Import Data > CSV**).
+    2. Navigate to **Analyze > General Linear Model > Univariate**.
+    3. Map the independent factors to **Fixed Factor(s)** and your response metrics to the **Dependent Variable**.
     """)
